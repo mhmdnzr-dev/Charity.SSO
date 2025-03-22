@@ -1,20 +1,22 @@
 using CharityHub.SSO.Configs;
 using Serilog;
- 
 using CharityHub.SSO.Extensions;
 using Microsoft.Extensions.Options;
 
 
 namespace CharityHub.SSO;
+
 internal static class HostingExtensions
 {
     public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
     {
-        builder.Host.UseSerilog(Log.Logger);
-
         var appSettings = builder.Configuration.GetSection("AppSettings").Get<AppSettings>();
 
         builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+
+        
+  
+
 
         builder.Services.AddRazorPages(options =>
         {
@@ -50,7 +52,7 @@ internal static class HostingExtensions
         app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseRouting();
-        
+
         app.UseAuthentication(); // Ensure authentication is applied
         app.UseIdentityServer();
         app.UseAuthorization();
