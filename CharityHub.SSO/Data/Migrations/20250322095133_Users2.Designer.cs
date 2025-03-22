@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CharityHub.SSO.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250322085815_Users2")]
+    [Migration("20250322095133_Users2")]
     partial class Users2
     {
         /// <inheritdoc />
@@ -21,7 +21,7 @@ namespace CharityHub.SSO.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("Sso")
-                .HasAnnotation("ProductVersion", "8.0.7")
+                .HasAnnotation("ProductVersion", "9.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
