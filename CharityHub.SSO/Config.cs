@@ -29,14 +29,14 @@ public static class Config
     {
        new Client
         {
-            ClientId = "SappPlusCompanyUIClient",
+            ClientId = "CharityHubAdminPanelClient",
             ClientSecrets = { new Secret("K8T1L7J9V0D3R+4W6Fz5X2Q8B1N7P3C4G0A9J7R8H6=".Sha256()) },
             AllowedGrantTypes = GrantTypes.Code,
             RequirePkce = true,
             AllowOfflineAccess = true,
-            RedirectUris = { "https://localhost:7076/signin-oidc" },
-            FrontChannelLogoutUri = "https://localhost:7076/signout-oidc",
-            PostLogoutRedirectUris = { "https://localhost:7076/signout-callback" },
+            RedirectUris = { "https://localhost:7091/signin-oidc" },
+            FrontChannelLogoutUri = "https://localhost:7091/signout-oidc",
+            PostLogoutRedirectUris = { "https://localhost:7091/signout-callback" },
             AllowedScopes = {
                 "openid",
                 "profile",
@@ -51,7 +51,7 @@ public static class Config
             AbsoluteRefreshTokenLifetime = 2592000, // 30 days
             SlidingRefreshTokenLifetime = 1296000, // 15 days
             RequireClientSecret = true,
-            ClientName = "SappPlusCompanyUI",
+            ClientName = "CharityHubAdminUI",
             RequireConsent = false,
             AllowRememberConsent = true,
             AlwaysIncludeUserClaimsInIdToken = true, // Ensure claims are included

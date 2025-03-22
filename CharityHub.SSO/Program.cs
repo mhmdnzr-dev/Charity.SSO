@@ -1,23 +1,61 @@
 ﻿using CharityHub.SSO;
 using CharityHub.SSO.Configs;
+using CharityHub.SSO.Data;
+using CharityHub.SSO.Models;
+using Duende.IdentityServer.EntityFramework.DbContexts;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Serilog.Extensions.Hosting;
 
 Console.WriteLine("Starting up");
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Host.UseSerilog((ctx, lc) => lc
+// ✅ Proper Serilog setup
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
-    .ReadFrom.Configuration(ctx.Configuration));
+    .CreateLogger();
 
-var appSettings = new AppSettings();
-builder.Configuration.Bind(appSettings);
+builder.Host.UseSerilog(Log.Logger);
 
-builder.Services.AddSingleton(appSettings);
+
+
+
+
+// ✅ Ensure authentication is not being added multiple times
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Account/Login";
+    options.AccessDeniedPath = "/Account/AccessDenied";
+});
+
+builder.Services.AddSingleton<DiagnosticContext>();
 
 var app = builder
     .ConfigureServices()
     .ConfigurePipeline();
+
+// ✅ Apply all migrations before starting the app
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var dbContexts = new DbContext[]
+    {
+        services.GetRequiredService<ApplicationDbContext>(),
+        services.GetRequiredService<ConfigurationDbContext>(),
+        services.GetRequiredService<PersistedGrantDbContext>()
+    };
+
+    foreach (var dbContext in dbContexts)
+    {
+        Console.WriteLine($"Applying migrations for {dbContext.GetType().Name}...");
+        dbContext.Database.Migrate();
+    }
+
+    Console.WriteLine("Database is up to date.");
+}
 
 if (args.Contains("/seed"))
 {
