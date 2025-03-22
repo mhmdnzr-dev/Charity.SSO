@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CharityHub.SSO.Data.Migrations
 {
     [DbContext(typeof(PersistedGrantDbContext))]
-    [Migration("20250322100930_PersistedGrantMigration")]
+    [Migration("20250322161143_PersistedGrantMigration")]
     partial class PersistedGrantMigration
     {
         /// <inheritdoc />

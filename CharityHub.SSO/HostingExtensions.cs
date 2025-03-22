@@ -10,39 +10,29 @@ internal static class HostingExtensions
 {
     public static WebApplication ConfigureServices(this WebApplicationBuilder builder)
     {
-        // Bind configuration
-        builder.Services.Configure<AppSettings>(builder.Configuration);
+        builder.Host.UseSerilog(Log.Logger);
 
-        // Build service provider and get AppSettings
-        var appSettings = builder.Services.BuildServiceProvider().GetRequiredService<IOptions<AppSettings>>().Value;
+        var appSettings = builder.Configuration.GetSection("AppSettings").Get<AppSettings>();
 
-    
+        builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 
-        #region ProtectRoute
-        // Add services to the container.
         builder.Services.AddRazorPages(options =>
         {
-            // options.Conventions.AuthorizePage("/Contact");
-            // options.Conventions.AuthorizeFolder("/Dashboard");
-            //options.Conventions.AllowAnonymousToPage("/Private/PublicPage");
             options.Conventions.AllowAnonymousToFolder("/Account/Create");
         });
-        #endregion
-
-
-
 
         builder.Services.AddCustomServices();
         builder.Services.AddCustomDbContext(appSettings.ConnectionStrings.DefaultConnection);
         builder.Services.AddCustomIdentityServer(appSettings.ConnectionStrings.DefaultConnection);
         builder.Services.AddCustomCors(appSettings.Cors.AllowedOrigins);
         builder.Services.AddCustomAuthentication();
+        builder.Services.AddSession(); // Ensure session services are added
 
-
-
-
-
-
+        builder.Services.ConfigureApplicationCookie(options =>
+        {
+            options.LoginPath = "/Account/Login";
+            options.AccessDeniedPath = "/Account/AccessDenied";
+        });
 
         return builder.Build();
     }
@@ -55,17 +45,18 @@ internal static class HostingExtensions
         {
             app.UseDeveloperExceptionPage();
         }
-        app.UseSession();
 
+        app.UseSession();
         app.UseHttpsRedirection();
         app.UseStaticFiles();
         app.UseRouting();
+        
+        app.UseAuthentication(); // Ensure authentication is applied
         app.UseIdentityServer();
         app.UseAuthorization();
 
-
-      
         app.MapRazorPages().RequireAuthorization();
+
         return app;
     }
 }

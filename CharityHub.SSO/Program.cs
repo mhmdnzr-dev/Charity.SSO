@@ -1,70 +1,73 @@
 ﻿using CharityHub.SSO;
 using CharityHub.SSO.Configs;
 using CharityHub.SSO.Data;
-using CharityHub.SSO.Models;
 using Duende.IdentityServer.EntityFramework.DbContexts;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using Serilog.Extensions.Hosting;
 
 Console.WriteLine("Starting up");
 
 var builder = WebApplication.CreateBuilder(args);
+// Bind AppSettings
+builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
+var appSettings = builder.Configuration.GetSection("AppSettings").Get<AppSettings>();
 
-// ✅ Proper Serilog setup
+// Configure Serilog using AppSettings
 Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
+    .ReadFrom.Configuration(builder.Configuration.GetSection("AppSettings:Serilog"))
     .Enrich.FromLogContext()
     .CreateLogger();
 
-builder.Host.UseSerilog(Log.Logger);
 
 
-
-
-
-// ✅ Ensure authentication is not being added multiple times
-builder.Services.ConfigureApplicationCookie(options =>
+try
 {
-    options.LoginPath = "/Account/Login";
-    options.AccessDeniedPath = "/Account/AccessDenied";
-});
+    var app = builder.ConfigureServices().ConfigurePipeline();
 
-builder.Services.AddSingleton<DiagnosticContext>();
-
-var app = builder
-    .ConfigureServices()
-    .ConfigurePipeline();
-
-// ✅ Apply all migrations before starting the app
-using (var scope = app.Services.CreateScope())
-{
+    using var scope = app.Services.CreateScope();
     var services = scope.ServiceProvider;
+
     var dbContexts = new DbContext[]
     {
-        services.GetRequiredService<ApplicationDbContext>(),
+        services.GetRequiredService<ApplicationDbContext>(), 
         services.GetRequiredService<ConfigurationDbContext>(),
         services.GetRequiredService<PersistedGrantDbContext>()
     };
 
     foreach (var dbContext in dbContexts)
     {
-        Console.WriteLine($"Applying migrations for {dbContext.GetType().Name}...");
-        dbContext.Database.Migrate();
+        try
+        {
+            Console.WriteLine($"Applying migrations for {dbContext.GetType().Name}...");
+            dbContext.Database.Migrate();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Migration failed for {dbContext.GetType().Name}: {ex.Message}");
+            Log.Error(ex, "Migration error for {DbContext}", dbContext.GetType().Name);
+            throw;
+        }
     }
 
     Console.WriteLine("Database is up to date.");
-}
 
-if (args.Contains("/seed"))
+    if (args.Contains("/seed"))
+    {
+        Console.WriteLine("Seeding database...");
+        await SeedData.EnsureSeedDataAsync(app);
+        Console.WriteLine("Done seeding database. Exiting.");
+        return;
+    }
+
+    app.Run();
+}
+catch (Exception ex)
 {
-    Console.WriteLine("Seeding database...");
-    await SeedData.EnsureSeedDataAsync(app);
-    Console.WriteLine("Done seeding database. Exiting.");
-    return;
+    Log.Fatal(ex, "Application startup failed.");
 }
-
-app.Run();
+finally
+{
+    Log.CloseAndFlush();
+}
 
 Console.WriteLine("Shut down complete");
