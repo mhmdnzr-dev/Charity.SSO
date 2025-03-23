@@ -1,18 +1,29 @@
 ﻿using CharityHub.SSO.Models;
 using CharityHub.SSO.Models.Common;
+using Duende.IdentityServer.Events;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace CharityHub.SSO.Data;
 
-public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<int>, int>
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, int,
+    IdentityUserClaim<int>, IdentityUserRole<int>,
+    IdentityUserLogin<int>, IdentityRoleClaim<int>,
+    ApplicationUserToken>
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
     }
-    public DbSet<Organization> Organizations { get; set; } // Include this line
+
+    public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+    public DbSet<ApplicationRole> ApplicationRoles { get; set; }
+    public DbSet<ApplicationUserToken> ApplicationUserTokens { get; set; }
+
+    public DbSet<Organization> Organizations { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -22,7 +33,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
 
         // Configure schema
         builder.HasDefaultSchema("Sso");
-
 
 
         // Apply configurations from the assembly
