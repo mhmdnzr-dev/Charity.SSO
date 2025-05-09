@@ -1,6 +1,5 @@
 ﻿using CharityHub.SSO.Models;
-using CharityHub.SSO.Models.Common;
-using Duende.IdentityServer.Events;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +21,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, Applicati
     public DbSet<ApplicationRole> ApplicationRoles { get; set; }
     public DbSet<ApplicationUserToken> ApplicationUserTokens { get; set; }
 
-    public DbSet<Organization> Organizations { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

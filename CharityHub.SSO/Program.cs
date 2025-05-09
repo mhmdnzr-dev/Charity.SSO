@@ -1,10 +1,14 @@
 ﻿using CharityHub.SSO;
+using Microsoft.AspNetCore.DataProtection;
 using Serilog;
 
 Console.WriteLine("Starting up");
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo("/home/app/.aspnet/DataProtection-Keys"))
+    .SetApplicationName("CharityHubSSO");
 
 
 Log.Logger = new LoggerConfiguration()

@@ -12,7 +12,7 @@ RUN dotnet restore
 COPY . . 
 
 # Build the application in Release mode
-RUN dotnet publish -c Release -o out
+RUN dotnet publish -c Release -o /app/out
 
 # Use the official ASP.NET Core runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
@@ -28,3 +28,6 @@ EXPOSE 80
 
 # Set the entry point for the container to run the application
 ENTRYPOINT ["dotnet", "CharityHub.SSO.dll"]
+
+# Optional: Add any environment variables you might need for configuration (e.g. connection strings, environment settings)
+# ENV ASPNETCORE_ENVIRONMENT=Production

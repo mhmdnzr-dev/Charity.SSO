@@ -12,9 +12,9 @@ public static class IdentityServerExtensions
         services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
         {
             // options.SignIn.RequireConfirmedEmail = true;
-            options.User.RequireUniqueEmail = false;
+            options.User.RequireUniqueEmail = true;
             options.Password.RequireDigit = false;
-            options.Password.RequiredLength = 2;
+            options.Password.RequiredLength = 6;
             options.Password.RequireUppercase = false;
             options.Password.RequireLowercase = false;
             options.Password.RequireNonAlphanumeric = false;

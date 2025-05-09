@@ -2,6 +2,15 @@ $ErrorActionPreference = "Stop"
 
 $migrationsPath = "Data/Migrations"
 
+#function Drop-Database {
+#    param ([string]$DbContext)
+#
+#    Write-Log "💣 Dropping existing database for $DbContext..." -Color Red
+#    Run-DotnetCommand "dotnet ef database drop -c $DbContext --force --yes"
+#    Show-Progress "$DbContext dropped"
+#}
+
+
 function Write-Log {
     param (
         [string]$Message,
@@ -64,8 +73,14 @@ function Seed-Database {
     Show-Progress "Database seeding completed"
 }
 
+
+
 # Execution
 Manage-Migrations
+
+#Drop-Database -DbContext "ApplicationDbContext"
+#Drop-Database -DbContext "PersistedGrantDbContext"
+#Drop-Database -DbContext "ConfigurationDbContext"
 
 Add-Migration -DbContext "ApplicationDbContext" -MigrationName "Users2" -Folder "Application"
 Add-Migration -DbContext "PersistedGrantDbContext" -MigrationName "PersistedGrantMigration" -Folder "PersistedGrants"

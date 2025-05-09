@@ -10,19 +10,8 @@ public static class Config
         {
             new IdentityResources.OpenId(),
             new IdentityResources.Profile(),
-            new IdentityResource("organizations", "User organizations", new List<string> { "organizationId" }),
-            new IdentityResource("roles", "User roles", new List<string> { "role" }), // Identity resource for roles
-            new IdentityResource("name", "User name", new List<string> { "name" }) // Identity resource for user 
         };
-
-  
-    public static IEnumerable<ApiScope> ApiScopes =>
-      new List<ApiScope>()
-      {
-       new ApiScope("organization.read", "Read organization data"),
-       new ApiScope("organization.write", "Write organization data"),
-      };
-
+    
 
     public static IEnumerable<Client> Clients =>
     new List<Client>
@@ -41,10 +30,7 @@ public static class Config
                 "openid",
                 "profile",
                 "roles",
-                "name",
-                "organizations", // Include organization scope
-                "organization.read", // Include organization read scope
-                "organization.write", // Include organization write scope
+                "name"
             },
             AccessTokenLifetime = 3600, // 1 hour
             IdentityTokenLifetime = 300, // 5 minutes
@@ -65,17 +51,14 @@ public static class Config
             AllowedGrantTypes = GrantTypes.Code,
             RequirePkce = true,
             AllowOfflineAccess = true,
-            RedirectUris = { "https://localhost:7091/signin-oidc" },
-            FrontChannelLogoutUri = "https://localhost:7091/signout-oidc",
-            PostLogoutRedirectUris = { "https://localhost:7091/signout-callback" },
+            RedirectUris = { "http://185.137.27.35:5050/signin-oidc" },
+            FrontChannelLogoutUri = "http://185.137.27.35:5050/signout-oidc",
+            PostLogoutRedirectUris = { "http://185.137.27.35:5050/signout-callback" },
             AllowedScopes = {
                 "openid",
                 "profile",
                 "roles",
                 "name",
-                "organizations", // Include organization scope
-                "organization.read", // Include organization read scope
-                "organization.write", // Include organization write scope
             },
             AccessTokenLifetime = 3600, // 1 hour
             IdentityTokenLifetime = 300, // 5 minutes
@@ -91,14 +74,5 @@ public static class Config
         }
     };
 
-    public static readonly string[] OrganizationRoles = { "PegahAdmin", "MihanAdmin" }; // Add this line
 
-    private static IEnumerable<ApiScope> GenerateScopes(string baseString)
-    {
-        return new List<ApiScope>
-        {
-            new ApiScope($"{baseString}.read", $"Read access for {baseString}"),
-            new ApiScope($"{baseString}.write", $"Write access for {baseString}")
-        };
-    }
 }
